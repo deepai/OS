@@ -6,10 +6,10 @@
 #include "mem_cpy.h"
 
 #define WORD uintptr_t;
-#define ALIGN_WORD sizeof(uintptr_t)
+#define ALIGN_WORD_SIZE sizeof(uintptr_t)
 
 static bool isAligned(void *pointer) {
-    if (((uintptr_t)pointer & (ALIGN_WORD - 1)) == 0) {
+    if (((uintptr_t)pointer & (ALIGN_WORD_SIZE - 1)) == 0) {
         return true;
     } else {
         return false;
@@ -26,11 +26,11 @@ static size_t mem_cpy_backward(void *src, void *dest, size_t bytes)
     int num_copies = 0;
 
     size_t current_bytes = 0;
-    size_t aligned_size = ALIGN_WORD;
+    size_t aligned_size = ALIGN_WORD_SIZE;
 
     if (isAligned(src_byte + bytes) && isAligned(dest_byte + bytes)) {
 #ifdef DEBUG
-        fprintf(stderr, "[Debug]: src = %p, dest = %p, Aligned memory, wordsize = %lu\n", src, dest, ALIGN_WORD);
+        fprintf(stderr, "[Debug]: src = %p, dest = %p, Aligned memory, wordsize = %lu\n", src, dest, ALIGN_WORD_SIZE);
 #endif
         dest_uintptr = (uintptr_t *)(dest_byte + bytes);
         src_uintptr = (uintptr_t *)(src_byte + bytes);
@@ -45,7 +45,7 @@ static size_t mem_cpy_backward(void *src, void *dest, size_t bytes)
         }
     } else {
 #ifdef DEBUG
-        fprintf(stderr, "[Debug]: src = %p, dest = %p, Non aligned memory, wordsize = %lu\n", src, dest, ALIGN_WORD);
+        fprintf(stderr, "[Debug]: src = %p, dest = %p, Non aligned memory, wordsize = %lu\n", src, dest, ALIGN_WORD_SIZE);
 #endif
         dest_byte = dest + bytes - 1;
         src_byte = src + bytes - 1;
@@ -73,24 +73,24 @@ static size_t mem_cpy_forward(void *src, void *dest, size_t bytes)
     int i = 0, j = 0;
 
     size_t current_bytes = 0;
-    size_t aligned_size = ALIGN_WORD;
+    size_t aligned_size = ALIGN_WORD_SIZE;
     int num_copies = 0;
 
     if (isAligned(src) && isAligned(dest)) {
 #ifdef DEBUG
-        fprintf(stderr, "[Debug]: src = %p, dest = %p, Aligned memory, wordsize = %lu\n", src, dest, ALIGN_WORD);
+        fprintf(stderr, "[Debug]: src = %p, dest = %p, Aligned memory, wordsize = %lu\n", src, dest, ALIGN_WORD_SIZE);
 #endif
         dest_uintptr = dest;
         src_uintptr = src;
-        for (; current_bytes + ALIGN_WORD <= bytes; i++) {
+        for (; current_bytes + ALIGN_WORD_SIZE <= bytes; i++) {
             dest_uintptr[i] = src_uintptr[i];
-            current_bytes += ALIGN_WORD;
-            j += ALIGN_WORD;
+            current_bytes += ALIGN_WORD_SIZE;
+            j += ALIGN_WORD_SIZE;
             num_copies++;
         }
     } else {
 #ifdef DEBUG
-        fprintf(stderr, "[Debug]: src = %p, dest = %p, Non aligned memory, wordsize = %lu\n", src, dest, ALIGN_WORD);
+        fprintf(stderr, "[Debug]: src = %p, dest = %p, Non aligned memory, wordsize = %lu\n", src, dest, ALIGN_WORD_SIZE);
 #endif
     }
 
