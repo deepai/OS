@@ -4,4 +4,5 @@ cmake_minimum_required(VERSION 3.10)
 project(memory)
 
 add_subdirectory(Ring_buffer)
+add_subdirectory(Ring_buffer_Semaphore)
 add_subdirectory(Mem_Copy)
