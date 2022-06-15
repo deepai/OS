@@ -134,6 +134,8 @@ void ring_buffer_deinit(ring_buffer *buf)
 #endif
 
 	/* wait on empty again */
+	sem_wait(&t->sem_empty);
+	
 	destroy_thread(&buf->consumer);
 
 	buf->buffer = NULL;
