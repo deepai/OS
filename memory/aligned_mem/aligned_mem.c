@@ -48,7 +48,12 @@ void *malloc_aligned(size_t size, size_t align_bytes)
 		fprintf(stderr, "Invalid argument align_size: [%lu]\n", align_bytes);
 		return NULL;
 	}
-	
+
+	if (size > UINT32_MAX - sizeof(uintptr_t) - align_bytes + 1) {
+		fprintf(stderr, "Size exceeds max limits: [%lu]\n", align_bytes);
+		return NULL;
+	}
+
 	alloc_size = sizeof(uintptr_t) + size + align_bytes - 1;
 
 	mem = malloc(alloc_size);
