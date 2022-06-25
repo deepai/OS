@@ -12,3 +12,5 @@ add_executable(thread_specific thread_specific.c)
 target_link_libraries(create_destroy_threads pthread)
 target_link_libraries(employee_mutex pthread)
 target_link_libraries(thread_specific pthread)
+
+add_subdirectory(producer_consumer)
