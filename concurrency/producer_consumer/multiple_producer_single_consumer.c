@@ -220,5 +220,7 @@ int main(int argc, char **argv) {
     free(producer_data);
     free(backing_buffer);
 
+    ring_buffer_deinit(ring_buffer);
+
     return 0;
 }
