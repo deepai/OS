@@ -2,10 +2,20 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "aligned_mem.h"
 
 #define ARR_SIZE 10
+
+static bool check_align_addr_correctness(void *ptr, size_t align_bytes)
+{
+	uintptr_t address = (uintptr_t)ptr;
+	if ((address & (align_bytes - 1)) == 0)
+		return true;
+	else
+		return false;
+}
 
 int main(int argc, char **argv) {
 	int i = 0;
@@ -34,8 +44,10 @@ int main(int argc, char **argv) {
 		arr_of_ptrs[i] = NULL;
 		arr_of_ptrs[i] = malloc_aligned((size_t)size, (size_t)aligned_size);
 		if (arr_of_ptrs[i] == NULL) {
-			fprintf(stdout, "Unable to allocate pointer:[%d]\n", i);
+			fprintf(stderr, "Unable to allocate pointer:[%d]\n", i);
 			break;
+		} else if (!check_align_addr_correctness(arr_of_ptrs[i], aligned_size)) {
+			fprintf(stderr, "Allocated address is not aligned\n");
 		}
 		fprintf(stdout, "Pointer allocated is %p\n", arr_of_ptrs[i]);
 	}
