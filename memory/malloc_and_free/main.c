@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <math.h>
 #include "custom_malloc.h"
 
 int main(int argc, char *argv[]) {
@@ -33,14 +34,16 @@ int main(int argc, char *argv[]) {
 		i = 0;
 		fprintf(stdout, "\n");
 		fprintf(stdout, "Iteration [%d]\n", 5 - j + 1);
+		size_t size;
 		for (; i < num_allocation; i++) {
 			ptr[i] = NULL;
-			ptr[i] = alloc_memory(per_allocation_bytes);
+			size = rand() % (per_allocation_bytes - 8) + 8;
+			ptr[i] = alloc_memory(size);
 			if (ptr[i] == NULL) {
-				fprintf(stderr, "Error allocating ptr[%d] \n", i);
+				fprintf(stderr, "Error allocating ptr[%d] of size = [%lu] \n", i, size);
 				break;
 			} else {
-				fprintf(stdout, "Allocated ptr[%d] = %p\n", i, ptr[i]);
+				fprintf(stdout, "Allocated ptr[%d] = %p of size = [%lu]\n", i, ptr[i], size);
 			}
 		}
 

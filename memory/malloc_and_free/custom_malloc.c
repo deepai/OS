@@ -163,6 +163,11 @@ void *find_free_node(size_t bytes) {
 static void split_block(alloc_t *block, size_t size)
 {
 	alloc_t *new_block = (alloc_t *)((uintptr_t)block + sizeof(alloc_t) - sizeof(uintptr_t) + size);
+
+#ifdef DEBUG
+	fprintf(stdout, "Splitting node %p of size %lu into size = %lu\n", block, block->size, size);
+#endif
+
 	*new_block = *block;
 
 	new_block->size = block->size - size;
@@ -174,15 +179,33 @@ static void split_block(alloc_t *block, size_t size)
 	block->is_split = 1;
 }
 
-static bool block_has_next_free(alloc_t *block)
+static bool block_can_combine(alloc_t *block)
 {
 	size_t size = block->size;
 	alloc_t *next = (alloc_t *)((uintptr_t)block + sizeof(alloc_t) - sizeof(uintptr_t) + size);
+
+	if (block->is_split == 1 && next  != NULL && next->magic_value == MAGICVALUE && next->is_free == 1) {
+		return true;
+	}
+
+	return false;
 }
 
-static void join_block(alloc_t *block_prev, alloc_t *block_next)
+static void join_block(alloc_t *block_prev)
 {
-	
+	alloc_t *next = (alloc_t *)((uintptr_t)block_prev + sizeof(alloc_t) - sizeof(uintptr_t) + block_prev->size);
+
+#ifdef DEBUG
+	fprintf(stdout, "Combining node %p of size %lu\n", block_prev, block_prev->size);
+#endif
+
+	block_prev->prev = next->prev;
+	block_prev->next = next->next;
+	block_prev->size += next->size;
+	block_prev->is_split = next->is_split;
+	block_prev->is_free = 1;
+
+	memset(block_prev->data, 0, block_prev->size);
 }
 
 void *alloc_memory(size_t bytes)
@@ -213,7 +236,7 @@ void *alloc_memory(size_t bytes)
 		}
 	} else {
 		if (block_can_split(block, bytes)) {
-
+			split_block(block, bytes);
 		}
 		remove_from_list(&gbl_free_lists, block);
 	}
@@ -241,9 +264,15 @@ void free_memory(void *ptr)
 	}
 
 	free_node(block);
-
 	remove_from_list(&gbl_reserved_lists, block);
-	insert_into_gbl_list(&gbl_free_lists, block);
+
+	if (block_can_combine(block)) {
+		while (block_can_combine(block)) {
+			join_block(block);
+		}
+	} else {
+		insert_into_gbl_list(&gbl_free_lists, block);
+	}
 
 #ifdef DEBUG
 	fprintf(stdout, "Freed node of size %lu\n", block->size);
