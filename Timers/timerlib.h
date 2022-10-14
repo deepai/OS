@@ -7,6 +7,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 typedef enum{
 	TIMER_INIT,
 	TIMER_RUNNING,
@@ -51,4 +56,9 @@ Timer_t *setup_timer(
 
 int resurrect_timer(Timer_t *timer);
 int start_timer(Timer_t *timer);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
